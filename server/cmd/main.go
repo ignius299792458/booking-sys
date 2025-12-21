@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/ignius299792458/techkraft-ch-svr/utils"
 )
 
 func main() {
@@ -14,11 +16,14 @@ func main() {
 	// pass to resolver
 	resolver(mux)
 
+	// Wrap with CORS middleware
+	handler := utils.CORS(mux)
+
 	// server setup
 	const addr string = ":8080"
 	srv := &http.Server{
 		Addr:              addr,
-		Handler:           mux,
+		Handler:           handler,
 		ReadTimeout:       10 * time.Second,
 		ReadHeaderTimeout: 5 * time.Second,
 		WriteTimeout:      15 * time.Second,

@@ -13,9 +13,10 @@ import (
 * VIP, FRONT_ROW, GA
   - seats can be set manual arr, but for now range is used
 
-* VIP 	:- first 100
-* FRONT 	:- 101 to 5000
-* GA 		:- other seats
+* VIP 	:- first 30 (seats 1-30)
+* FRONT_ROW 	:- 31 to 60 (seats 31-60)
+* GA 		:- 61 to 100 (seats 61-100)
+* TOTAL_SEAT = 100
 */
 type BOOKING_STORE_BUCKET struct {
 	BOOKING_STORE map[uint32]model.Booking // SeatNo -> Booking
@@ -27,14 +28,15 @@ type BOOKING_STORE_BUCKET struct {
 
 type BookingStore interface {
 	RegisterBooking(bookingOrderData model.BookingOrder) (model.Booking, error)
+	GetBooking(seatNo uint32) (model.Booking, error)
 	getSeatLock(seatNo uint32) *sync.Mutex
-	getReservedSeats() map[string][]uint32
+	GetReservedSeats() map[string][]uint32
 }
 
 func NewBookingStoreBucket() BookingStore {
 	return &BOOKING_STORE_BUCKET{
 		BOOKING_STORE: make(map[uint32]model.Booking),
-		TOTAL_SEAT:    50000,
+		TOTAL_SEAT:    100,
 	}
 }
 
@@ -103,8 +105,8 @@ func (b *BOOKING_STORE_BUCKET) RegisterBooking(
 	return newBooking, nil
 }
 
-// getReservedSeats returns a map of reserved seat numbers categorized by tier.
-func (b *BOOKING_STORE_BUCKET) getReservedSeats() map[string][]uint32 {
+// GetReservedSeats returns a map of reserved seat numbers categorized by tier.
+func (b *BOOKING_STORE_BUCKET) GetReservedSeats() map[string][]uint32 {
 	var VIPReservedSeats []uint32
 	var FRONTROWReservedSeats []uint32
 	var GAReservedSeats []uint32
@@ -125,4 +127,12 @@ func (b *BOOKING_STORE_BUCKET) getReservedSeats() map[string][]uint32 {
 		"FRONT_ROW": FRONTROWReservedSeats,
 		"GA":        GAReservedSeats,
 	}
+}
+
+func (b *BOOKING_STORE_BUCKET) GetBooking(seatNo uint32) (model.Booking, error) {
+	booking, exists := b.BOOKING_STORE[seatNo]
+	if !exists {
+		return model.Booking{}, errors.New("booking not found")
+	}
+	return booking, nil
 }

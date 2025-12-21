@@ -122,3 +122,18 @@ type BookingResponse struct {
 	Message string   `json:"message,omitempty"`
 	Booking *Booking `json:"booking,omitempty"`
 }
+
+type AvailabilityResponse struct {
+	Success        bool                `json:"success"`
+	Message        string              `json:"message,omitempty"`
+	AvaliableSeats map[string][]uint32 `json:"avaliableSeats,omitempty"`
+	Tiers          []TierInfo          `json:"tiers,omitempty"`
+}
+
+type TierInfo struct {
+	Tier          Tier     `json:"tier"`
+	Price         uint64   `json:"price"`         // in US cents
+	TotalSeats    uint32   `json:"totalSeats"`    // total seats for this tier
+	ReservedCount uint32   `json:"reservedCount"` // number of seats reserved for this tier
+	AvailableList []uint32 `json:"availableList,omitempty"`
+}

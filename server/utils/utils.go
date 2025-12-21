@@ -17,9 +17,6 @@ func ValidateBookingRequest(req *model.BookingOrder) error {
 	if req.SeatNo == 0 {
 		return NewValidationError("seat_no must be greater than 0")
 	}
-	if !req.Status.IsValidBookingStatus() {
-		return NewValidationError("invalid booking status")
-	}
 	if !req.Tier.IsValidTier() {
 		return NewValidationError("invalid tier")
 	}

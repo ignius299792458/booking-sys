@@ -8,7 +8,7 @@ import (
 
 func BookingRouter(bookingMux *http.ServeMux) {
 
-	// bookingMux.HandleFunc("GET /seats", getSeats)
+	bookingMux.HandleFunc("GET /availability", handlers.HandleAvailability)
 
 	bookingMux.HandleFunc("POST /ticket", handlers.HandleBooking)
 }
