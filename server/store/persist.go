@@ -67,11 +67,10 @@ func (b *BOOKING_STORE_BUCKET) RegisterBooking(
 	}
 
 	newBooking := model.Booking{
-		ID:       uuid.New(),
-		UserID:   bookingOrderData.UserID,
-		Tier:     bookingOrderData.Tier,
-		Quantity: bookingOrderData.Quantity,
-		Status:   bookingOrderData.Status,
+		ID:     uuid.New(),
+		UserID: bookingOrderData.UserID,
+		Tier:   bookingOrderData.Tier,
+		Status: bookingOrderData.Status,
 
 		IdempotencyKey: bookingOrderData.IdempotencyKey,
 
@@ -83,9 +82,20 @@ func (b *BOOKING_STORE_BUCKET) RegisterBooking(
 
 		TotalAmtInUSCent: bookingOrderData.TotalAmtInUSCent,
 		PaymentID:        bookingOrderData.PaymentID,
+		PaymentStatus:    bookingOrderData.PaymentStatus,
 
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
+	}
+
+	// if paymentId isn't nil or empty and paymentStatus is confirmed, set booking status to confirmed
+	if len(newBooking.PaymentID) > 0 && newBooking.PaymentStatus == model.PaymentStatusConfirmed {
+		newBooking.Status = model.BookingStatusConfirmed
+	}
+
+	// if paymentStatus is failed or canceled, set booking status to canceled
+	if newBooking.PaymentStatus == model.PaymentStatusFailed || newBooking.PaymentStatus == model.PaymentStatusCanceled {
+		newBooking.Status = model.BookingStatusCanceled
 	}
 
 	b.BOOKING_STORE[newBooking.SeatNo] = newBooking

@@ -17,28 +17,29 @@ func ValidateBookingRequest(req *model.BookingOrder) error {
 	if req.SeatNo == 0 {
 		return NewValidationError("seat_no must be greater than 0")
 	}
-	if req.Quantity == 0 {
-		return NewValidationError("quantity must be greater than 0")
+	if !req.Status.IsValidBookingStatus() {
+		return NewValidationError("invalid booking status")
 	}
-	if !req.Tier.IsValid() {
+	if !req.Tier.IsValidTier() {
 		return NewValidationError("invalid tier")
+	}
+	if !req.PaymentStatus.IsValidPaymentStatus() {
+		return NewValidationError("invalid payment status")
 	}
 	return nil
 }
 
-func CalculateAmount(tier model.Tier, quantity uint16) uint64 {
-	var pricePerSeat uint16
+func CalculateAmount(tier model.Tier) uint64 {
 	switch tier {
 	case model.TierVIP:
-		pricePerSeat = 50000 // $500 in cents
+		return 100 * 100 // $100 in cents
 	case model.TierFrontRow:
-		pricePerSeat = 20000 // $200 in cents
+		return 50 * 100 // $50 in cents
 	case model.TierGA:
-		pricePerSeat = 10000 // $100 in cents
+		return 10 * 100 // $10 in cents
 	default:
-		pricePerSeat = 10000
+		return 10 * 100 // default to $10 in cents
 	}
-	return uint64(pricePerSeat * quantity)
 }
 
 func RespondSuccess(w http.ResponseWriter, message string, booking *model.Booking) {

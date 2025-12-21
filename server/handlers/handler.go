@@ -41,13 +41,12 @@ func HandleBooking(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Calculate amount based on tier
-	totalAmt := utils.CalculateAmount(req.Tier, req.Quantity)
+	totalAmt := utils.CalculateAmount(req.Tier)
 
 	// Create booking order
 	bookingOrder := model.BookingOrder{
 		UserID:           req.UserID,
 		Tier:             req.Tier,
-		Quantity:         req.Quantity,
 		Status:           model.BookingStatusPending,
 		IdempotencyKey:   req.IdempotencyKey,
 		Country:          req.Country,
@@ -77,12 +76,13 @@ func HandleBooking(w http.ResponseWriter, r *http.Request) {
 	}
 
 	duration := time.Since(start).Milliseconds()
+	slog.Info("Booking processed duration : ", "duration_ms", duration, "sec: ", duration/1000)
+
 	slog.Info("Booking created",
 		"booking_id", newBooking.ID,
 		"user_id", newBooking.UserID,
 		"seat", newBooking.SeatNo,
-		"tier", newBooking.Tier,
-		"duration_ms", duration)
+		"tier", newBooking.Tier)
 
 	utils.RespondSuccess(w, "new booking successful", &newBooking)
 }

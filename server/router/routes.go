@@ -10,5 +10,5 @@ func BookingRouter(bookingMux *http.ServeMux) {
 
 	// bookingMux.HandleFunc("GET /seats", getSeats)
 
-	bookingMux.HandleFunc("POST /book", handlers.HandleBooking)
+	bookingMux.HandleFunc("POST /ticket", handlers.HandleBooking)
 }

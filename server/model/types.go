@@ -16,7 +16,7 @@ const (
 	TierGA       Tier = "GA"
 )
 
-func (t Tier) IsValid() bool {
+func (t Tier) IsValidTier() bool {
 	switch t {
 	case TierVIP, TierFrontRow, TierGA:
 		return true
@@ -43,6 +43,15 @@ const (
 	BookingStatusCanceled  BookingStatus = "CANCELED"  // optional future state
 )
 
+func (t BookingStatus) IsValidBookingStatus() bool {
+	switch t {
+	case BookingStatusPending, BookingStatusConfirmed, BookingStatusFailed, BookingStatusCanceled:
+		return true
+	default:
+		return false
+	}
+}
+
 type PaymentStatus string
 
 const (
@@ -52,12 +61,20 @@ const (
 	PaymentStatusCanceled  PaymentStatus = "CANCELED"
 )
 
+func (t PaymentStatus) IsValidPaymentStatus() bool {
+	switch t {
+	case PaymentStatusPending, PaymentStatusConfirmed, PaymentStatusFailed, PaymentStatusCanceled:
+		return true
+	default:
+		return false
+	}
+}
+
 type Booking struct {
-	ID       uuid.UUID     `json:"id"`
-	UserID   string        `json:"userId"` // mocked user id
-	Tier     Tier          `json:"tier"`
-	Quantity uint16        `json:"quantity"`
-	Status   BookingStatus `json:"status"`
+	ID     uuid.UUID     `json:"id"`
+	UserID string        `json:"userId"` // mocked user id
+	Tier   Tier          `json:"tier"`
+	Status BookingStatus `json:"status"`
 
 	// Idempotency: retries of the same "Book" click should reuse this key.
 	IdempotencyKey string `json:"idempotencyKey,omitempty"`
@@ -71,18 +88,18 @@ type Booking struct {
 	Currency string `json:"currency"`
 
 	// Payment
-	TotalAmtInUSCent uint64 `json:"totalAmtInUSCent"`
-	PaymentID        string `json:"paymentID"`
+	TotalAmtInUSCent uint64        `json:"totalAmtInUSCent"`
+	PaymentID        string        `json:"paymentID"`
+	PaymentStatus    PaymentStatus `json:"paymentStatus"`
 
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 type BookingOrder struct {
-	UserID   string        `json:"userId"` // mocked user id
-	Tier     Tier          `json:"tier"`
-	Quantity uint16        `json:"quantity"`
-	Status   BookingStatus `json:"status"`
+	UserID string        `json:"userId"` // mocked user id
+	Tier   Tier          `json:"tier"`
+	Status BookingStatus `json:"status"`
 
 	IdempotencyKey string `json:"idempotencyKey,omitempty"`
 
@@ -95,8 +112,9 @@ type BookingOrder struct {
 	SeatNo uint32 `json:"seatNo"`
 
 	// Payment
-	TotalAmtInUSCent uint64 `json:"totalAmtInUSCent"`
-	PaymentID        string `json:"paymentID"`
+	TotalAmtInUSCent uint64        `json:"totalAmtInUSCent"`
+	PaymentID        string        `json:"paymentID"`
+	PaymentStatus    PaymentStatus `json:"paymentStatus"`
 }
 
 type BookingResponse struct {
