@@ -44,7 +44,7 @@ func (ib *IDEMPOTENCY_BUCKET) HandleIdempotency(
 
 	// prevent non-idempotency booking
 	if bookingOrder, exists := ib.IDEMPOTENCY_STORE[bookingOrderData.IdempotencyKey]; exists {
-		if bookingOrderData.Status == model.BookingStatusConfirmed {
+		if bookingOrderData.Status != model.BookingStatusPending {
 			// update the stored booking status to confirmed
 			bookingOrder.Status = bookingOrderData.Status
 			ib.IDEMPOTENCY_STORE[bookingOrderData.IdempotencyKey] = bookingOrder

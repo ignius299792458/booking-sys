@@ -72,7 +72,9 @@ func HandleBooking(w http.ResponseWriter, r *http.Request) {
 	bookingOrder.Status = newBooking.Status
 
 	// Update idempotency store with complete booking info
-	idempotencyStore.HandleIdempotency(bookingOrder)
+	if newBooking.Status != model.BookingStatusPending {
+		idempotencyStore.HandleIdempotency(bookingOrder)
+	}
 
 	duration := time.Since(start).Milliseconds()
 	slog.Info("Booking created",
