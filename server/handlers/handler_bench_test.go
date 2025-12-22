@@ -75,9 +75,8 @@ func BenchmarkHandleAvailability(b *testing.B) {
 	}
 
 	req := httptest.NewRequest(http.MethodGet, "/booking/availability", nil)
-	b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		w := httptest.NewRecorder()
 		HandleAvailability(w, req)
 	}
