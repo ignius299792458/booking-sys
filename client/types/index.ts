@@ -67,16 +67,19 @@ export interface AvailabilityResponse {
 }
 
 // Helper to get tier display name
-export function getTierDisplayName(tier: Tier): string {
+export function getTierDisplayNameAndColor(tier: Tier): {
+  name: string;
+  color: string;
+} {
   switch (tier) {
     case "VIP":
-      return "VIP";
+      return { name: "VIP", color: "bg-green-100 text-green-800" };
     case "FRONT_ROW":
-      return "Front Row";
+      return { name: "Front Row", color: "bg-blue-100 text-blue-800" };
     case "GA":
-      return "General Admission";
+      return { name: "General Admission", color: "bg-gray-100 text-gray-800" };
     default:
-      return tier;
+      return { name: tier, color: "bg-gray-100 text-gray-800" };
   }
 }
 

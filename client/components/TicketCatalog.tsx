@@ -3,8 +3,8 @@
 import {
   TierInfo,
   formatPrice,
-  getTierDisplayName,
   getAvailableCount,
+  getTierDisplayNameAndColor,
 } from "@/types";
 
 interface TicketCatalogProps {
@@ -38,11 +38,15 @@ export default function TicketCatalog({
       {tiers.map((tierInfo) => (
         <div
           key={tierInfo.tier}
-          className="border rounded-lg p-6 bg-white shadow-sm hover:shadow-md transition-shadow"
+          className={
+            "rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow" +
+            " " +
+            getTierDisplayNameAndColor(tierInfo.tier).color
+          }
         >
           <div className="flex justify-between items-start mb-4">
             <h3 className="text-xl font-semibold text-gray-900">
-              {getTierDisplayName(tierInfo.tier)}
+              {getTierDisplayNameAndColor(tierInfo.tier).name}
             </h3>
             <span
               className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -67,8 +71,8 @@ export default function TicketCatalog({
           </div>
 
           <div className="pt-4 border-t">
-            <p className="text-sm text-gray-600">
-              <span className="font-medium">
+            <p className="text-medium font-medium text-gray-800">
+              <span className="font-bold text-lg">
                 {getAvailableCount(tierInfo.totalSeats, tierInfo.reservedCount)}
               </span>{" "}
               tickets available

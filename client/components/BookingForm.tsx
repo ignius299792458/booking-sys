@@ -5,7 +5,7 @@ import {
   Tier,
   getSeatRangeForTier,
   formatPrice,
-  getTierDisplayName,
+  getTierDisplayNameAndColor,
   TierInfo,
 } from "@/types";
 import {
@@ -101,7 +101,7 @@ export default function BookingForm({
         throw new Error(
           `Seat number must be between ${seatRange.min} and ${
             seatRange.max
-          } for ${getTierDisplayName(selectedTier)}`
+          } for ${getTierDisplayNameAndColor(selectedTier).name}`
         );
       }
 
@@ -208,7 +208,7 @@ export default function BookingForm({
   return (
     <div className="border rounded-lg p-6 bg-white">
       <h2 className="text-xl font-semibold text-gray-600 mb-4">
-        Book {getTierDisplayName(selectedTier)} Ticket
+        Book {getTierDisplayNameAndColor(selectedTier).name} Ticket
       </h2>
       <p className="text-gray-600 mb-6">
         Price:{" "}
@@ -255,7 +255,7 @@ export default function BookingForm({
               value={formData.seatNo}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 text-gray-800 text-medium py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select a seat</option>
               {availableSeats.map((seat) => (
@@ -286,7 +286,7 @@ export default function BookingForm({
             value={formData.country}
             onChange={handleChange}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border text-gray-800 text-medium border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="e.g., USA, UK, Canada"
           />
         </div>
@@ -305,7 +305,7 @@ export default function BookingForm({
             value={formData.zipCode}
             onChange={handleChange}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 text-gray-800 text-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="e.g., 10001"
           />
         </div>
@@ -322,7 +322,7 @@ export default function BookingForm({
             name="currency"
             value={formData.currency}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 text-gray-800 text-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="USD">USD</option>
             <option value="EUR">EUR</option>
