@@ -32,7 +32,7 @@ export interface BookingOrder {
   zipCode: string;
   currency: string;
   seatNo: number;
-  totalAmtInUSCent: number;
+  // totalAmtInUSCent: number; this will be calculated on the server
   paymentID: string;
   paymentStatus: PaymentStatus;
 }

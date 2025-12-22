@@ -39,6 +39,8 @@ export async function getAvailability(): Promise<AvailabilityResponse> {
     },
   });
 
+  console.log("GET availability response", response);
+
   if (!response.ok) {
     throw new Error(`Failed to fetch availability: ${response.statusText}`);
   }
@@ -57,15 +59,6 @@ export async function bookTicket(
   >,
   idempotencyKey: string
 ): Promise<BookingResponse> {
-  // Calculate total amount based on tier
-  const tierPrices: Record<string, number> = {
-    VIP: 10000, // $100 in cents
-    FRONT_ROW: 5000, // $50 in cents
-    GA: 1000, // $10 in cents
-  };
-
-  const totalAmtInUSCent = tierPrices[order.tier] || 1000;
-
   // Simulate payment - generate a payment ID and set status to CONFIRMED
   const paymentID = `pay_${Date.now()}_${Math.random()
     .toString(36)
@@ -76,7 +69,6 @@ export async function bookTicket(
   const bookingOrder: BookingOrder = {
     ...order,
     idempotencyKey,
-    totalAmtInUSCent,
     status,
     paymentID,
     paymentStatus,
