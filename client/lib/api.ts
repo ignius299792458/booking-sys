@@ -39,13 +39,12 @@ export async function getAvailability(): Promise<AvailabilityResponse> {
     },
   });
 
-  console.log("GET availability response", response);
-
   if (!response.ok) {
     throw new Error(`Failed to fetch availability: ${response.statusText}`);
   }
-
-  return response.json();
+  const data = await response.json();
+  console.log("GET availability response", data);
+  return data;
 }
 
 export async function bookTicket(
