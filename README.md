@@ -441,3 +441,7 @@ Creates a new ticket booking.
 - GET `/booking/availability`: < 50ms (cached)
 - POST `/booking/ticket`: < 200ms (with database)
 - p95 target: < 500ms ✅
+
+# BENCHMARK
+
+Assignment Reviewer is requested to find Benchmark Result at `BENCHMARK_RESULTS.md`
