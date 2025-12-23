@@ -154,5 +154,5 @@ ok      github.com/ignius299792458/techkraft-ch-svr     0.511s
 **Final Verdict:**
 
 - **Current system (in-memory):** ✅ p99.99 ≈ 5-8ms << 50ms
-- **With PostgreSQL (optimized):** ✅ p99.99 ≈ 25-45ms < 50ms (meets target)
+- **With PostgreSQL (optimized):** ✅ p99.99 ≈ 25-45ms < 50ms (meets target p95 <- 500ms)
 - **With PostgreSQL + Redis cache:** ✅ p99.99 ≈ 15-30ms < 50ms (exceeds target)
