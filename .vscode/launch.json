@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "techkraft-svr",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/server/cmd",
+      "cwd": "${workspaceFolder}/server",
+      "args": [],
+      "envFile": "${workspaceFolder}/server/.env",
+      "env": {},
+      "showLog": true
+    }
+  ]
+}
