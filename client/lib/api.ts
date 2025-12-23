@@ -73,6 +73,8 @@ export async function bookTicket(
     paymentStatus,
   };
 
+  console.log("POST booking order data: ", bookingOrder);
+
   const response = await fetch(`${API_BASE_URL}/booking/ticket`, {
     method: "POST",
     headers: {
