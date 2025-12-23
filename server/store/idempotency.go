@@ -7,7 +7,7 @@ import (
 )
 
 type IDEMPOTENCY_BUCKET struct {
-	IDEMPOTENCY_STORE map[string]model.BookingOrder // IdempotencyKey -> BookingOrder
+	IDEMPOTENCY_STORE sync.Map // map[string]model.BookingOrder - IdempotencyKey -> BookingOrder
 
 	// idempotency-level locks (idempotency key as key)
 	idempotencyLocks sync.Map // map[string]*sync.Mutex
@@ -20,7 +20,7 @@ type Idempotency interface {
 
 func NewIdempotencyBucket() Idempotency {
 	return &IDEMPOTENCY_BUCKET{
-		IDEMPOTENCY_STORE: make(map[string]model.BookingOrder),
+		IDEMPOTENCY_STORE: sync.Map{},
 	}
 }
 
@@ -43,17 +43,18 @@ func (ib *IDEMPOTENCY_BUCKET) HandleIdempotency(
 	// ---- CRITICAL SECTION (idempotency key-scoped) ----
 
 	// prevent non-idempotency booking
-	if bookingOrder, exists := ib.IDEMPOTENCY_STORE[bookingOrderData.IdempotencyKey]; exists {
+	if bookingOrderInterface, exists := ib.IDEMPOTENCY_STORE.Load(bookingOrderData.IdempotencyKey); exists {
+		bookingOrder := bookingOrderInterface.(model.BookingOrder)
 		if bookingOrderData.Status != model.BookingStatusPending {
 			// update the stored booking status to confirmed
 			bookingOrder.Status = bookingOrderData.Status
-			ib.IDEMPOTENCY_STORE[bookingOrderData.IdempotencyKey] = bookingOrder
+			ib.IDEMPOTENCY_STORE.Store(bookingOrderData.IdempotencyKey, bookingOrder)
 		}
 		return bookingOrder
 	}
 
 	// idempotency-key : bookingOrderData the booking
-	ib.IDEMPOTENCY_STORE[bookingOrderData.IdempotencyKey] = bookingOrderData
+	ib.IDEMPOTENCY_STORE.Store(bookingOrderData.IdempotencyKey, bookingOrderData)
 
 	return bookingOrderData
 }

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"sort"
+	"slices"
 	"sync"
 	"testing"
 	"time"
@@ -52,16 +52,16 @@ func BenchmarkEndToEndBooking(b *testing.B) {
 		PaymentStatus:  model.PaymentStatusConfirmed,
 	}
 
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
+	for i := 0; b.Loop(); i++ {
 		order := bookingOrder
 		order.SeatNo = uint32(i%100 + 1)
 		order.IdempotencyKey = "e2e-key-" + string(rune(i))
 
 		body, _ := json.Marshal(order)
-		resp, _ := http.Post(server.URL+"/booking/ticket", "application/json", bytes.NewBuffer(body))
-		resp.Body.Close()
+		resp, err := http.Post(server.URL+"/booking/ticket", "application/json", bytes.NewBuffer(body))
+		if err == nil && resp != nil {
+			resp.Body.Close()
+		}
 	}
 }
 
@@ -116,9 +116,12 @@ func BenchmarkP95Latency(b *testing.B) {
 
 				body, _ := json.Marshal(order)
 				start := time.Now()
-				resp, _ := http.Post(server.URL+"/booking/ticket", "application/json", bytes.NewBuffer(body))
+				resp, err := http.Post(server.URL+"/booking/ticket", "application/json", bytes.NewBuffer(body))
 				duration := time.Since(start)
-				resp.Body.Close()
+
+				if err == nil && resp != nil {
+					resp.Body.Close()
+				}
 
 				mu.Lock()
 				latencies = append(latencies, duration)
@@ -129,9 +132,7 @@ func BenchmarkP95Latency(b *testing.B) {
 	wg.Wait()
 
 	// Calculate percentiles
-	sort.Slice(latencies, func(i, j int) bool {
-		return latencies[i] < latencies[j]
-	})
+	slices.Sort(latencies)
 
 	p50Index := int(float64(len(latencies)) * 0.50)
 	p95Index := int(float64(len(latencies)) * 0.95)

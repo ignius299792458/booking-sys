@@ -22,6 +22,9 @@ type BOOKING_STORE_BUCKET struct {
 	BOOKING_STORE map[uint32]model.Booking // SeatNo -> Booking
 	TOTAL_SEAT    uint32
 
+	// Protects the BOOKING_STORE map structure from concurrent access
+	mapMu sync.RWMutex
+
 	// seat-level locks (seat number as key)
 	seatLocks sync.Map // map[uint32]*sync.Mutex
 }
@@ -62,6 +65,10 @@ func (b *BOOKING_STORE_BUCKET) RegisterBooking(
 	defer seatBookingLock.Unlock()
 
 	// ---- CRITICAL SECTION (seat-scoped) ----
+
+	// Acquire map write lock before accessing the map
+	b.mapMu.Lock()
+	defer b.mapMu.Unlock()
 
 	// prevent double booking
 	if _, exists := b.BOOKING_STORE[bookingOrderData.SeatNo]; exists {
@@ -107,9 +114,12 @@ func (b *BOOKING_STORE_BUCKET) RegisterBooking(
 
 // GetReservedSeats returns a map of reserved seat numbers categorized by tier.
 func (b *BOOKING_STORE_BUCKET) GetReservedSeats() map[string][]uint32 {
-	var VIPReservedSeats []uint32
-	var FRONTROWReservedSeats []uint32
-	var GAReservedSeats []uint32
+	b.mapMu.RLock()
+	defer b.mapMu.RUnlock()
+
+	VIPReservedSeats := make([]uint32, 0)
+	FRONTROWReservedSeats := make([]uint32, 0)
+	GAReservedSeats := make([]uint32, 0)
 
 	for seatNo, booking := range b.BOOKING_STORE {
 		switch booking.Tier {
@@ -130,6 +140,9 @@ func (b *BOOKING_STORE_BUCKET) GetReservedSeats() map[string][]uint32 {
 }
 
 func (b *BOOKING_STORE_BUCKET) GetBooking(seatNo uint32) (model.Booking, error) {
+	b.mapMu.RLock()
+	defer b.mapMu.RUnlock()
+
 	booking, exists := b.BOOKING_STORE[seatNo]
 	if !exists {
 		return model.Booking{}, errors.New("booking not found")

@@ -34,10 +34,11 @@ func TestHandleIdempotency(t *testing.T) {
 				PaymentStatus:  model.PaymentStatusPending,
 			},
 			validateFunc: func(t *testing.T, ib *IDEMPOTENCY_BUCKET, result model.BookingOrder) {
-				stored, exists := ib.IDEMPOTENCY_STORE["key-new"]
+				storedInterface, exists := ib.IDEMPOTENCY_STORE.Load("key-new")
 				if !exists {
 					t.Error("Expected idempotency key to be stored")
 				}
+				stored := storedInterface.(model.BookingOrder)
 				if stored.UserID != "user-1" {
 					t.Errorf("Expected stored UserID 'user-1', got '%s'", stored.UserID)
 				}
@@ -62,14 +63,14 @@ func TestHandleIdempotency(t *testing.T) {
 				PaymentStatus:  model.PaymentStatusPending,
 			},
 			setupFunc: func(ib *IDEMPOTENCY_BUCKET) {
-				ib.IDEMPOTENCY_STORE["key-existing"] = model.BookingOrder{
+				ib.IDEMPOTENCY_STORE.Store("key-existing", model.BookingOrder{
 					UserID:         "user-original",
 					Tier:           model.TierFrontRow,
 					SeatNo:         31,
 					Status:         model.BookingStatusPending,
 					IdempotencyKey: "key-existing",
 					PaymentStatus:  model.PaymentStatusPending,
-				}
+				})
 			},
 			validateFunc: func(t *testing.T, ib *IDEMPOTENCY_BUCKET, result model.BookingOrder) {
 				// Should return original order, not the new one
@@ -94,19 +95,28 @@ func TestHandleIdempotency(t *testing.T) {
 				IdempotencyKey: "key-update",
 				PaymentStatus:  model.PaymentStatusConfirmed,
 			},
+			expectedReturn: model.BookingOrder{
+				UserID:         "user-3",
+				Tier:           model.TierVIP,
+				SeatNo:         3,
+				Status:         model.BookingStatusConfirmed,
+				IdempotencyKey: "key-update",
+				PaymentStatus:  model.PaymentStatusConfirmed,
+			},
 			setupFunc: func(ib *IDEMPOTENCY_BUCKET) {
-				ib.IDEMPOTENCY_STORE["key-update"] = model.BookingOrder{
+				ib.IDEMPOTENCY_STORE.Store("key-update", model.BookingOrder{
 					UserID:         "user-3",
 					Tier:           model.TierVIP,
 					SeatNo:         3,
 					Status:         model.BookingStatusPending,
 					IdempotencyKey: "key-update",
 					PaymentStatus:  model.PaymentStatusPending,
-				}
+				})
 			},
 			validateFunc: func(t *testing.T, ib *IDEMPOTENCY_BUCKET, result model.BookingOrder) {
 				// Should update status in store
-				stored := ib.IDEMPOTENCY_STORE["key-update"]
+				storedInterface, _ := ib.IDEMPOTENCY_STORE.Load("key-update")
+				stored := storedInterface.(model.BookingOrder)
 				if stored.Status != model.BookingStatusConfirmed {
 					t.Errorf("Expected stored status CONFIRMED, got %s", stored.Status)
 				}
@@ -125,19 +135,28 @@ func TestHandleIdempotency(t *testing.T) {
 				IdempotencyKey: "key-pending",
 				PaymentStatus:  model.PaymentStatusPending,
 			},
+			expectedReturn: model.BookingOrder{
+				UserID:         "user-4",
+				Tier:           model.TierVIP,
+				SeatNo:         4,
+				Status:         model.BookingStatusPending,
+				IdempotencyKey: "key-pending",
+				PaymentStatus:  model.PaymentStatusPending,
+			},
 			setupFunc: func(ib *IDEMPOTENCY_BUCKET) {
-				ib.IDEMPOTENCY_STORE["key-pending"] = model.BookingOrder{
+				ib.IDEMPOTENCY_STORE.Store("key-pending", model.BookingOrder{
 					UserID:         "user-4",
 					Tier:           model.TierVIP,
 					SeatNo:         4,
 					Status:         model.BookingStatusPending,
 					IdempotencyKey: "key-pending",
 					PaymentStatus:  model.PaymentStatusPending,
-				}
+				})
 			},
 			validateFunc: func(t *testing.T, ib *IDEMPOTENCY_BUCKET, result model.BookingOrder) {
 				// Should return existing order without updating
-				stored := ib.IDEMPOTENCY_STORE["key-pending"]
+				storedInterface, _ := ib.IDEMPOTENCY_STORE.Load("key-pending")
+				stored := storedInterface.(model.BookingOrder)
 				if stored.Status != model.BookingStatusPending {
 					t.Errorf("Expected stored status to remain PENDING, got %s", stored.Status)
 				}
@@ -153,31 +172,45 @@ func TestHandleIdempotency(t *testing.T) {
 				IdempotencyKey: "key-multi-1",
 				PaymentStatus:  model.PaymentStatusPending,
 			},
+			expectedReturn: model.BookingOrder{
+				UserID:         "user-5",
+				Tier:           model.TierGA,
+				SeatNo:         61,
+				Status:         model.BookingStatusPending,
+				IdempotencyKey: "key-multi-1",
+				PaymentStatus:  model.PaymentStatusPending,
+			},
 			setupFunc: func(ib *IDEMPOTENCY_BUCKET) {
 				// Store multiple keys
-				ib.IDEMPOTENCY_STORE["key-multi-1"] = model.BookingOrder{
+				ib.IDEMPOTENCY_STORE.Store("key-multi-1", model.BookingOrder{
 					UserID:         "user-5",
 					Tier:           model.TierGA,
 					SeatNo:         61,
 					IdempotencyKey: "key-multi-1",
-				}
-				ib.IDEMPOTENCY_STORE["key-multi-2"] = model.BookingOrder{
+				})
+				ib.IDEMPOTENCY_STORE.Store("key-multi-2", model.BookingOrder{
 					UserID:         "user-6",
 					Tier:           model.TierVIP,
 					SeatNo:         10,
 					IdempotencyKey: "key-multi-2",
-				}
+				})
 			},
 			validateFunc: func(t *testing.T, ib *IDEMPOTENCY_BUCKET, result model.BookingOrder) {
 				// Verify both keys still exist
-				if _, exists := ib.IDEMPOTENCY_STORE["key-multi-1"]; !exists {
+				if _, exists := ib.IDEMPOTENCY_STORE.Load("key-multi-1"); !exists {
 					t.Error("Expected key-multi-1 to exist")
 				}
-				if _, exists := ib.IDEMPOTENCY_STORE["key-multi-2"]; !exists {
+				if _, exists := ib.IDEMPOTENCY_STORE.Load("key-multi-2"); !exists {
 					t.Error("Expected key-multi-2 to exist")
 				}
-				if len(ib.IDEMPOTENCY_STORE) != 2 {
-					t.Errorf("Expected 2 stored keys, got %d", len(ib.IDEMPOTENCY_STORE))
+				// Count keys in sync.Map
+				count := 0
+				ib.IDEMPOTENCY_STORE.Range(func(key, value interface{}) bool {
+					count++
+					return true
+				})
+				if count != 2 {
+					t.Errorf("Expected 2 stored keys, got %d", count)
 				}
 			},
 		},
@@ -238,15 +271,21 @@ func TestHandleIdempotency_Concurrency(t *testing.T) {
 	}
 
 	// Only one order should be stored (first one wins)
-	if len(ib.IDEMPOTENCY_STORE) != 1 {
-		t.Errorf("Expected 1 stored order, got %d", len(ib.IDEMPOTENCY_STORE))
+	count := 0
+	ib.IDEMPOTENCY_STORE.Range(func(key, value interface{}) bool {
+		count++
+		return true
+	})
+	if count != 1 {
+		t.Errorf("Expected 1 stored order, got %d", count)
 	}
 
 	// Verify stored order
-	stored, exists := ib.IDEMPOTENCY_STORE[idempotencyKey]
+	storedInterface, exists := ib.IDEMPOTENCY_STORE.Load(idempotencyKey)
 	if !exists {
 		t.Fatal("Expected idempotency key to be stored")
 	}
+	stored := storedInterface.(model.BookingOrder)
 	if stored.IdempotencyKey != idempotencyKey {
 		t.Errorf("Expected stored IdempotencyKey %s, got %s", idempotencyKey, stored.IdempotencyKey)
 	}
@@ -285,7 +324,8 @@ func TestHandleIdempotency_StatusUpdate(t *testing.T) {
 	}
 
 	// Verify stored order is updated
-	stored := ib.IDEMPOTENCY_STORE[idempotencyKey]
+	storedInterface, _ := ib.IDEMPOTENCY_STORE.Load(idempotencyKey)
+	stored := storedInterface.(model.BookingOrder)
 	if stored.Status != model.BookingStatusConfirmed {
 		t.Errorf("Expected stored status CONFIRMED, got %s", stored.Status)
 	}

@@ -164,15 +164,20 @@ func TestHandleBooking(t *testing.T) {
 			},
 			expectedStatus: http.StatusOK,
 			setupFunc: func() {
-				// First booking with this idempotency key
-				bookingStore.RegisterBooking(model.BookingOrder{
+				// First booking with this idempotency key - need to register both in store and idempotency
+				bookingOrder := model.BookingOrder{
 					UserID:         "user-123",
 					Tier:           model.TierVIP,
 					SeatNo:         3,
+					Status:         model.BookingStatusConfirmed,
 					IdempotencyKey: "key-idempotent",
 					PaymentID:      "pay-idempotent",
 					PaymentStatus:  model.PaymentStatusConfirmed,
-				})
+				}
+				// Register in idempotency store first
+				idempotencyStore.HandleIdempotency(bookingOrder)
+				// Then register the booking
+				bookingStore.RegisterBooking(bookingOrder)
 			},
 		},
 	}
