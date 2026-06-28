@@ -3,7 +3,7 @@ package router
 import (
 	"net/http"
 
-	"github.com/ignius299792458/techkraft-ch-svr/handlers"
+	"github.com/ignius299792458/dbi-svr/handlers"
 )
 
 func BookingRouter(bookingMux *http.ServeMux) {

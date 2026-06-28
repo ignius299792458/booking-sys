@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/ignius299792458/techkraft-ch-svr/utils"
+	"github.com/ignius299792458/dbi-svr/utils"
 )
 
 func main() {

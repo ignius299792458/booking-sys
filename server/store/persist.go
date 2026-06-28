@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/ignius299792458/techkraft-ch-svr/model"
+	"github.com/ignius299792458/dbi-svr/model"
 )
 
 /*

@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/ignius299792458/techkraft-ch-svr/model"
-	"github.com/ignius299792458/techkraft-ch-svr/store"
+	"github.com/ignius299792458/dbi-svr/model"
+	"github.com/ignius299792458/dbi-svr/store"
 )
 
 // setupTestHandlers creates fresh instances for testing

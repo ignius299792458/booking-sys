@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ignius299792458/techkraft-ch-svr/model"
+	"github.com/ignius299792458/dbi-svr/model"
 )
 
 // BenchmarkHandleBooking benchmarks the HandleBooking function

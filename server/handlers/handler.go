@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ignius299792458/techkraft-ch-svr/model"
-	"github.com/ignius299792458/techkraft-ch-svr/store"
-	"github.com/ignius299792458/techkraft-ch-svr/utils"
+	"github.com/ignius299792458/dbi-svr/model"
+	"github.com/ignius299792458/dbi-svr/store"
+	"github.com/ignius299792458/dbi-svr/utils"
 )
 
 var (

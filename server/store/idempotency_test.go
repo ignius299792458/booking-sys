@@ -4,7 +4,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/ignius299792458/techkraft-ch-svr/model"
+	"github.com/ignius299792458/dbi-svr/model"
 )
 
 func TestHandleIdempotency(t *testing.T) {

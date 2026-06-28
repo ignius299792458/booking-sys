@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/ignius299792458/techkraft-ch-svr/model"
+	"github.com/ignius299792458/dbi-svr/model"
 )
 
 func ValidateBookingRequest(req *model.BookingOrder) error {

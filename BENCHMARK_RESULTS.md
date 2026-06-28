@@ -14,7 +14,7 @@ BenchmarkHandleAvailability-8       403491      2937 ns/op     3530 B/op    36 a
 BenchmarkHandleIdempotency_P95-8    1000000000     0.0008883 ns/op  1000 iterations  .0008750 p95_ms   0 B/op  0 allocs/op
 BenchmarkRegisterBooking_P95-8      1000000000   0.001694 ns/op  1000 iterations   0.001750 p95_ms   0 B/op   0 allocs/op
 ```
-
+ 
 Inference of BenchmarkEndToEndBooking:
 
 **🎯 Overall P95 Performance Evaluation:** The system demonstrates exceptional p95 percentile performance with **2.335ms p95 latency** across 1000 total operations, achieving **99.4% faster than the 500ms target**. Combined with end-to-end booking operations completing in ~45.6µs average and core functions (idempotency: 0.875µs, registration: 1.75µs p95), the system delivers **sub-3ms p95 response times** with zero allocations in critical paths, making it production-ready for high-throughput, low-latency booking scenarios.
@@ -30,11 +30,11 @@ Inference of BenchmarkEndToEndBooking:
 # Running BenchmarkP95Latency
 
 ```
-Running tool: /opt/homebrew/bin/go test -test.fullpath=true -benchmem -run=^$ -bench ^BenchmarkP95Latency$ github.com/ignius299792458/techkraft-ch-svr
+Running tool: /opt/homebrew/bin/go test -test.fullpath=true -benchmem -run=^$ -bench ^BenchmarkP95Latency$ github.com/ignius299792458/dbi-svr
 
 goos: darwin
 goarch: arm64
-pkg: github.com/ignius299792458/techkraft-ch-svr
+pkg: github.com/ignius299792458/dbi-svr
 cpu: Apple M2
 === RUN   BenchmarkP95Latency
 BenchmarkP95Latency
@@ -89,7 +89,7 @@ P99 Latency: 2ms
 ========================
 BenchmarkP95Latency-8           1000000000               0.02024 ns/op           0.6162 p50_ms           2.335 p95_ms            2.956 p99_ms            1000 total_requests              0 B/op          0 allocs/op
 PASS
-ok      github.com/ignius299792458/techkraft-ch-svr     0.511s
+ok      github.com/ignius299792458/dbi-svr     0.511s
 
 ```
 

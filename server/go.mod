@@ -1,4 +1,4 @@
-module github.com/ignius299792458/techkraft-ch-svr
+module github.com/ignius299792458/dbi-svr
 
 go 1.25.1
 

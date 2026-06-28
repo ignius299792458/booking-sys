@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/ignius299792458/techkraft-ch-svr/router"
+	"github.com/ignius299792458/dbi-svr/router"
 )
 
 func resolver(mux *http.ServeMux) {
